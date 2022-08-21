@@ -93,10 +93,6 @@ def nuevacuenta():
     salario= input('Escriba su salario actual (mensual): ')
     
     
-    #datos = f'{nombre}',f'{cedula}', f'{tel}', f'{edad}', f'{direc}', f'{trabajo}',f'{tiempotrabajando}', f'{salario}'
-    #sql_insertar = f"insert into {tabla} (nom_cli, cedula_cli, tel_cli, edad_cli, direc_cli, trabajo_cli, yearWork_cli, salario_cli) VALUES (%s,%s, %s,%s,%s,%s,%s,%s)"
-
-    #mycursor.execute(sql_insertar,datos)
 
     sql='INSERT INTO Cliente (nom_cli, cedula_cli, tel_cli, edad_cli, direc_cli, trabajo_cli, yearWork_cli, salario_cli) VALUES (%s,%s, %s,%s,%s,%s,%s,%s)' 
     val=(nombre, cedula, tel, edad, direc, trabajo, tiempotrabajando, salario)
@@ -595,10 +591,12 @@ if(opcion == 3):
         3- Pago de Prestamo
         4- Cancelación de Prestamo
         5- Estado de Cuenta de Prestamo
-        7- Historial de Pago
+        6- Historial de Pago
         0- salir
         ''')
 
+    #REVISAR HISTORIAL DE PAGOS O MOVIMIENTOS EN CUENTA 
+    
     elige = int(input('Por favor seleccione la opcion: \n'))
 
     if(elige == 1):
@@ -615,6 +613,12 @@ if(opcion == 3):
     if(elige==5):
         estado()
 
+    if (elige==0):
+        exit()
+
+    else:
+        print('El numero establecido es incorrecto. ')
+
 
 if (opcion==5):
     consultacliente()
@@ -630,3 +634,6 @@ if(opcion == 8):
 
 if(opcion==9):
     historial()
+
+else:
+        print('El numero establecido es incorrecto. ')

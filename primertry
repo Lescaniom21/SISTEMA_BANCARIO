@@ -259,34 +259,29 @@ def consultacliente():
     for x in result:
         print(x)
 
-
+# Recuerda anexar los cambios en TABLA MOVIMIENTO funcion RETIRO y DEPOSITO
 #Transferencias Bancarias
 def transferencias():
     mi_cursor= mi_conexion.cursor()
-    
-    
-    
-# ARREGLAR CODESSS
 
-# Recuerda anexar los cambios en TABLA MOVIMIENTO funcion RETIRO y DEPOSITO
+    print('TRANSFERENCIAS BANCARIAS')
+    cuentapropia=int(input("Digite ID cuenta propio: "))
+    cliente=int(input("Digite su ID cliente"))
+    cuenta2=int(input("Digite ID de la cuenta a depositar: "))
+    deposito=int(input('Digite la cantidad a transferir'))
 
-'''
-
-    cuenta=int(input("por favor dijite su id_cuenta"))
-    #ID
-    cliente=int(input("por favor dijite su id_cliente"))
-    mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuenta, cliente))
+    mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuentapropia, cliente))
     lista_con_elementos = []
     for x in mi_cursor:
         lista_con_elementos.append(x) 
 
     print(lista_con_elementos[0][0])
 
-    total=int(lista_con_elementos[0][0]) - cantidad_retiro
+    total=int(lista_con_elementos[0][0]) - deposito
     print(total)
     resultado=str(total)
         
-    sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {} and id_cli= {}".format(resultado, cuenta, cliente)
+    sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {} and id_cli= {}".format(resultado, cuentapropia, cliente)
     
     mi_cursor.execute(sql)
 
@@ -295,11 +290,64 @@ def transferencias():
     print(mi_cursor.rowcount, "record(s) affected")
 
 
-'''
+    # CUENTA A DEPOSITAR EN TRANSFERENCIA
+    mi_cursor = mi_conexion.cursor()
+    mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} ".format(cuenta2))
+    lista = []
+    for x in mi_cursor:
+        lista.append(x) 
+
+    print(lista[0][0])
+
+    depositado=int(lista[0][0]) + deposito
+    print(depositado)
+    resultado=str(depositado)
+        
+    sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {}".format(resultado, cuenta2)
+    
+    mi_cursor.execute(sql)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "record(s) affected")
+
+
 
 
 
 #insertando y arreglando funciones de Charlot
+
+
+def estado():
+    mycursor=mi_conexion.cursor()
+    print("Consulta de clientes \n")
+    cliente=input("por favor introduzca su ID cliente")
+
+    
+    mycursor.execute('SELECT nom_cli FROM Cliente WHERE id_cli={}'.format(cliente)) 
+    nombrecli= mycursor.fetchall()
+    for x in nombrecli:
+        print("Cliente")
+        print(x)
+        
+
+    mycursor.execute('SELECT balancedisponible_cuenta FROM Cuenta WHERE id_cli={}'.format(cliente))
+    balance= mycursor.fetchall()
+    for x in balance:
+        print("Monto Total Cuenta")
+        print(x)
+
+
+
+    mycursor.execute('SELECT monto_pres FROM Prestamos WHERE id_cli={}'.format(cliente)) 
+    #Falta agrgar monto pagado.
+    montoprestamo= mycursor.fetchall()
+    for x in montoprestamo:
+        print("Monto Prestado")
+        print(x)
+
+
+
 
 #obtener monto de prestamo
 def pagoprestamo():
@@ -507,7 +555,6 @@ def historial():
     print(lista)
 
 
-
 #a=input('Diga name')
 #b=input('Diga pass')
 
@@ -564,11 +611,17 @@ if(opcion == 3):
 
     if(elige == 3):
         pagoprestamo()  
+    
+    if(elige==5):
+        estado()
 
 
 if (opcion==5):
     consultacliente()
-   
+
+if (opcion==6):
+    transferencias()
+
 if(opcion == 7):
     retiroFT() 
 

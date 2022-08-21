@@ -149,4 +149,7 @@ for x in myresult:
 #mycursor.execute('SELECT * FROM TarjetaCredito')
 
 
-mycursor.execute('ALTER TABLE Cliente ADD COLUMN salario_cli VARCHAR(12)')
+#mycursor.execute('ALTER TABLE Cliente ADD COLUMN salario_cli VARCHAR(12)')
+
+
+#mycursor.execute('CREATE TABLE Historial (id_h INT AUTOINCREMENT )')

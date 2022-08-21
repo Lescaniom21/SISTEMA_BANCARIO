@@ -20,6 +20,7 @@ try:
         database = "Banquito"
     )
         
+    
     if mi_conexion.is_connected():
         print("Conexión establecida correctamente.")
 
@@ -27,7 +28,7 @@ try:
 
 except Error as e:
     conexion=None
-    print('Ha ocurrido un error')
+    print('Ha ocurrido un error: ')
     print(e)
     
    
@@ -228,6 +229,76 @@ def movimientos():
     for x in result:
         print(x)
 
+
+# Funcion Clientes Activos
+'''
+def clientesactive():
+    cursor=mi_conexion.cursor()
+
+    sql = "SELECT * FROM Cliente\
+    INNER JOIN Cuenta ON id_cli=id_cuenta\
+        WHERE estado_cuenta='Activa'"
+    
+
+    cursor.execute(sql)
+
+    myresult = cursor.fetchall()
+
+    for x in myresult:
+        print(x)
+'''
+
+# Cliente Consulta
+def consultacliente():
+    cursor=mi_conexion.cursor()
+
+    cursor.execute('SELECT * FROM Cliente ORDER BY nom_cli ')
+
+    result = cursor.fetchall()
+
+    for x in result:
+        print(x)
+
+
+#Transferencias Bancarias
+def transferencias():
+    mi_cursor= mi_conexion.cursor()
+    
+    
+    
+# ARREGLAR CODESSS
+
+# Recuerda anexar los cambios en TABLA MOVIMIENTO funcion RETIRO y DEPOSITO
+
+'''
+
+    cuenta=int(input("por favor dijite su id_cuenta"))
+    #ID
+    cliente=int(input("por favor dijite su id_cliente"))
+    mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuenta, cliente))
+    lista_con_elementos = []
+    for x in mi_cursor:
+        lista_con_elementos.append(x) 
+
+    print(lista_con_elementos[0][0])
+
+    total=int(lista_con_elementos[0][0]) - cantidad_retiro
+    print(total)
+    resultado=str(total)
+        
+    sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {} and id_cli= {}".format(resultado, cuenta, cliente)
+    
+    mi_cursor.execute(sql)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "record(s) affected")
+
+
+'''
+
+
+
 #insertando y arreglando funciones de Charlot
 
 #obtener monto de prestamo
@@ -302,6 +373,7 @@ def cancelacionpres():
 
 
 #cancelacion de prestamo
+'''
 def consulta_prestamo():
     cursor= mi_conexion.cursor()
     cursor.execute("SELECT monto_prestamo FROM prestamo where cedula= {} and id= {} ".format(cedula, numero_prestamo))
@@ -317,10 +389,123 @@ def consulta_prestamo():
         #print("Lo sentimos, usted esta pagando mas de lo que debe")
     else:
         print("Lo sentimos, usted no ha calificado para cancelar su prestamo")
-
+'''
 
 def exit():
     print('Gracias por usar nuestros servicios.')
+
+
+
+# INTEGRANDO DARWIN'S CODE
+
+#deposito de efectivo
+
+def tabladeamortizacion():
+    #Calculando una tabla de amortización de un préstamo
+    mycursor= mi_conexion.cursor()
+
+    #ID
+    cliente=int(input("por favor dijite su id_cliente"))
+    mycursor.execute("SELECT nom_cli,cedula_cli FROM Cliente where id_cli= {} ".format(cliente))
+    lista_con_elementos = []
+    for x in mycursor:
+        lista_con_elementos.append(x) 
+
+    codcliente=lista_con_elementos[0][0]
+    cedula=lista_con_elementos[0][1]
+    print('el cliente es', codcliente,cedula)
+
+
+    print("Tabla de amortizacion")
+    prestamo = float(input("Digite el monto del prestamo: "))
+    tiempo = int(input("Plazo del prestamo (meses): "))
+    interesAnual = float(input("Interes a aplicar al prestamo: "))
+    #formula para la cuota fija
+    interesMensual = (interesAnual/12)/100
+    cuota = ((prestamo* interesMensual)/(1-(math.pow((1+interesMensual),(tiempo*-1)))))
+    pagototal= cuota * tiempo
+    interestotales=cuota*tiempo
+            
+    fecha= "2022-04-22"
+    ahora = datetime.strptime(fecha, '%Y-%m-%d')
+    fechadepago= ahora + timedelta(days=25)
+    print("")
+    print("   Interes Anual: ",interesAnual,"%","\t\t","Monto: $", prestamo,  )
+    print("   Plazo Meses: ",tiempo,"\t\t" ,"Pago Total", pagototal)
+    print("Monto Total Intereses: ", interestotales)
+    print("{:^10}{:^10}{:^10}{:^12}{:^10}{:^15}" . format("N°", "Cuota","Interes","Amortizacion", "saldo", "Fecha de Pago"))
+    nuevosaldo= prestamo 
+    
+    mes= 1
+    for i in range (tiempo+1):
+        if(i==0):
+            print("{:^10}{:^10}{:^10}{:^12}{:^10}{:}" . format(mes," "," "," ",prestamo,fechadepago))
+        else:
+            # desde aqui empezo la prueba
+            while mes >= tiempo:
+                print(mes+1)
+            pagoInteres = nuevosaldo*interesMensual
+            Amortizacion = cuota-pagoInteres
+            nuevosaldo = nuevosaldo-Amortizacion
+            fecha= "2022-04-22"
+            ahora = datetime.strptime(fecha, '%Y-%m-%d')
+            fechadepago= ahora + timedelta(days=25)
+            
+            print("{:^10d}{:^10.2f}{:^10.2f}{:^12.2f}{:^10.2f}{}" . format(mes,cuota,pagoInteres,Amortizacion,nuevosaldo,fechadepago))
+
+
+# DEPOSITO
+def Deposito():
+  
+    mi_cursor = mi_conexion.cursor()
+    cantidad_deposito= int(input("por favor digite el monto que desea depositar"))
+    cuenta=int(input("por favor dijite su id_cuenta"))
+    #ID
+    cliente=int(input("por favor dijite su id_cliente"))
+    mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuenta, cliente))
+    lista_con_elementos = []
+    for x in mi_cursor:
+        lista_con_elementos.append(x) 
+
+    print(lista_con_elementos[0][0])
+
+    total=int(lista_con_elementos[0][0]) + cantidad_deposito
+    print(total)
+    resultado=str(total)
+        
+    sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {} and id_cli= {}".format(resultado, cuenta, cliente)
+    
+    mi_cursor.execute(sql)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "record(s) affected")
+
+
+
+def historial():
+        #Calculando una tabla de amortización de un préstamo
+    mycursor = mi_conexion.cursor()
+
+
+    #ID
+    cliente=int(input("por favor dijite su id_cliente"))
+    mycursor.execute("SELECT nom_cli,cedula_cli FROM Cliente where id_cli= {} ".format(cliente))
+    lista_con_elementos = []
+    for x in mycursor:
+        lista_con_elementos.append(x) 
+
+    codcliente=lista_con_elementos[0][0]
+    cedula=lista_con_elementos[0][1]
+
+
+    mycursor.execute("SELECT * FROM Movimientos where id_cli= {} ".format(cliente))
+    lista=[]
+    for x in mycursor:
+        lista.append (x)
+    print('el cliente es', codcliente,cedula)
+    print(lista)
+
 
 
 #a=input('Diga name')
@@ -339,8 +524,7 @@ print('''
       1- Crear Nueva Cuenta Cliente
       2- Deposito a Cuenta Corriente
       3- Prestamos
-      4- Solicitud Tarjeta de Credito
-      5- Consulta de Clientes Activos
+      4- Consulta de Clientes Activos
       6- Transferencias Bancarias
       7- Retiro de Efectivo
       8- Consulta Balance de Cuenta
@@ -354,7 +538,7 @@ if(opcion == 1):
     nuevacuenta()  
 
 if(opcion == 2):
-    nuevacuenta() 
+    Deposito() 
 
 if(opcion == 3):  
 
@@ -374,13 +558,22 @@ if(opcion == 3):
         solicitar()  
 
 
+    if(elige==2):
+        tabladeamortizacion()
+
+
     if(elige == 3):
         pagoprestamo()  
 
 
+if (opcion==5):
+    consultacliente()
    
 if(opcion == 7):
     retiroFT() 
 
 if(opcion == 8):
     balance() 
+
+if(opcion==9):
+    historial()

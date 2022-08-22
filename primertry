@@ -69,9 +69,7 @@ def mostrarbd():
         print(e)
 
 
-
-
-#prueba desde aqui
+#Iniciamos desde aqui
 
 salario=()
 prestamo=int()
@@ -183,15 +181,43 @@ def solicitar():
                             mi_cursor.execute(sql, val)
 
                             mi_conexion.commit()
-                            print(mi_cursor.rowcount, "prestamo anexado.")
+                            print(mi_cursor.rowcount, " prestamo anexado.")
                             
                                                     
                         else:
                             print ('Pr\u00E9stamo rechazado')
-                            print ('Nombre: ' + nombre)
+                            print ('Cliente: ' + nombre)
                             print ('Valor de puntos: ' + repr (puntos))
-                            print ()
+                            print ('Lo sentimos, usted no cumple con los parametros necesarios.')
                             os.system ('pause')
+
+                    else:
+                            print ('Pr\u00E9stamo rechazado')
+                            print ('Nombre: ' + nombre)
+                            print ('Lo sentimos, usted no cumple con los parametros necesarios.')
+
+                            
+                            os.system ('pause')
+                
+                else:
+                    print ('Pr\u00E9stamo rechazado')
+                    print ('Nombre: ' + nombre)
+                    print ('Lo sentimos, usted no cumple con los parametros necesarios.')
+                   
+                   
+                    os.system ('pause')
+
+        else:
+            print ('Pr\u00E9stamo rechazado')
+            print ('Nombre: ' + nombre)
+            print ('Lo sentimos, usted no cumple con los parametros necesarios.')
+            os.system ('pause')
+    
+    else:
+        print ('Pr\u00E9stamo rechazado')
+        print ('Nombre: ' + nombre)
+        print ('Lo sentimos, usted no cumple con los parametros necesarios.')
+        os.system ('pause')
 
                             #hasta aqui
 
@@ -248,11 +274,12 @@ def clientesactive():
 def consultacliente():
     cursor=mi_conexion.cursor()
 
-    cursor.execute('SELECT * FROM Cliente ORDER BY nom_cli ')
+    cursor.execute('SELECT * FROM Cliente ')
 
     result = cursor.fetchall()
-
+    print('ID -  Cliente  -  Cedula - Telefono - Edad - Direccion - Trabaja - Tiempo Trabajando - Salario')
     for x in result:
+        
         print(x)
 
 # Recuerda anexar los cambios en TABLA MOVIMIENTO funcion RETIRO y DEPOSITO
@@ -261,6 +288,7 @@ def transferencias():
     mi_cursor= mi_conexion.cursor()
 
     print('TRANSFERENCIAS BANCARIAS')
+    fechita=input('Digite la fecha: ')
     cuentapropia=int(input("Digite ID cuenta propio: "))
     cliente=int(input("Digite su ID cliente"))
     cuenta2=int(input("Digite ID de la cuenta a depositar: "))
@@ -271,10 +299,10 @@ def transferencias():
     for x in mi_cursor:
         lista_con_elementos.append(x) 
 
-    print(lista_con_elementos[0][0])
+    print('Monto Previo Cuenta Emisora ',lista_con_elementos[0][0])
 
     total=int(lista_con_elementos[0][0]) - deposito
-    print(total)
+    print('Monto Actual Cuenta Emisora ',total)
     resultado=str(total)
         
     sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {} and id_cli= {}".format(resultado, cuentapropia, cliente)
@@ -293,10 +321,10 @@ def transferencias():
     for x in mi_cursor:
         lista.append(x) 
 
-    print(lista[0][0])
+    print('Monto Previo Cuenta Receptora ',lista[0][0])
 
     depositado=int(lista[0][0]) + deposito
-    print(depositado)
+    print('Monto Actual Cuenta Receptora ',depositado)
     resultado=str(depositado)
         
     sql = "UPDATE Cuenta  SET balancedisponible_cuenta = {} WHERE  id_cuenta= {}".format(resultado, cuenta2)
@@ -307,8 +335,32 @@ def transferencias():
 
     print(mi_cursor.rowcount, "record(s) affected")
 
+    # Esto es para el historial
+    # esta descripcion es para la cuenta emisora
+    descripcion='Transferencia bancaria'
+
+    #esta descripcion es para la cuenta receptora
+    descripcion2='Deposito'
+
+    # Desde esta parte se va a afectar tambien la tabla MOVIMIENTOS de la base de datos
+
+    sql='INSERT INTO Movimientos (id_cli, id_cuenta, monto_movi, descrip_movi, fecha_movi) VALUES (%s,%s, %s,%s,%s)' 
+    val=(cliente, cuentapropia, deposito, descripcion, fechita)
+    mi_cursor.execute(sql, val)
+
+    mi_conexion.commit()
 
 
+    sql2='INSERT INTO Movimientos (id_cli, id_cuenta, monto_movi, descrip_movi, fecha_movi) VALUES (%s,%s, %s,%s,%s)' 
+    val2=(cuenta2, cuenta2,deposito, descripcion2, fechita)
+    mi_cursor.execute(sql2, val2)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "Accion registrada exitosamente.")
+
+
+# Funcion ESTADO 
 def estado():
     mycursor=mi_conexion.cursor()
     print("Consulta de clientes \n")
@@ -622,7 +674,7 @@ print('''
       1- Crear Nueva Cuenta Cliente
       2- Deposito a Cuenta Corriente
       3- Prestamos
-      4- Consulta de Clientes Activos
+      4- Consulta de Clientes 
       6- Transferencias Bancarias
       7- Retiro de Efectivo
       8- Consulta Balance de Cuenta
@@ -688,7 +740,7 @@ elif(opcion == 3):
 
 
 elif (opcion==4):
-    print('Estamos trabajando en esta funcion')
+    consultacliente()
 
 elif (opcion==5):
     consultacliente()

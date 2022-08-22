@@ -372,8 +372,6 @@ def estado():
         print(x)
 
 
-#integrando code de Mendez
-
 
 #obtener monto de prestamo
 
@@ -546,8 +544,6 @@ def exit():
     desconectarbd(mi_conexion)
 
 
-# INTEGRANDO DARWIN'S CODE
-
 #deposito de efectivo
 
 def tabladeamortizacion():
@@ -673,6 +669,32 @@ def historial():
     print(lista)
 
 
+def historialpagos():
+    
+    mycursor = mi_conexion.cursor()
+    try:
+        cliente=int(input("Digite su ID Cliente: "))
+        mycursor.execute("SELECT id_pago, monto_pago, fecha_pago FROM Pagos where id_cli= {} ".format(cliente))
+        lista = []
+        for x in mycursor:
+            lista.append(x) 
+        
+
+        mycursor.execute("SELECT nom_cli FROM Cliente where id_cli= {} ".format(cliente))
+        listita = []
+        for x in mycursor:
+            listita.append(x) 
+
+        nomcliente=listita[0][0]
+
+
+        print('\n', 'HISTORIAL DE PAGOS')
+        print('Cliente: ', nomcliente, '\n')
+        print('ID - Monto - Fecha')
+        print(lista)
+
+    except Error as e:
+        print('Al parecer este Cliente no ha realizado ningun pago de prestamos.')
 
 
 #desde aqui el menu de opciones
@@ -738,7 +760,7 @@ elif(opcion == 3):
         estado()
 
     elif(elige == 6):
-        print('Not ready')
+        historialpagos()
 
     elif (elige==0):
         exit()

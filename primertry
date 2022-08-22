@@ -472,12 +472,15 @@ def pagoprestamo():
 
 #retiro de efectivo
 def retiroFT():
-  
+    
     mi_cursor = mi_conexion.cursor()
-    cantidad_retiro= int(input("por favor digite el monto que desea retirar"))
-    cuenta=int(input("por favor dijite su id_cuenta"))
+    fechita = input('Digite la fecha: ')
+    cliente=int(input("Digite ID de Cliente: "))
+    cuenta=int(input("Digite ID de Cuenta: "))
+    cantidad_retiro= int(input("Digite el monto que desea retirar: "))
+    
     #ID
-    cliente=int(input("por favor dijite su id_cliente"))
+    
     mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuenta, cliente))
     lista_con_elementos = []
     for x in mi_cursor:
@@ -496,6 +499,18 @@ def retiroFT():
     mi_conexion.commit()
 
     print(mi_cursor.rowcount, "record(s) affected")
+
+    descripcion2= 'Retiro en Efectivo'
+
+    # Desde aqui code para que se anexen registros a la BD 
+    
+    sql2='INSERT INTO Movimientos (id_cli, id_cuenta, monto_movi, descrip_movi, fecha_movi) VALUES (%s,%s, %s,%s,%s)' 
+    val2=(cuenta, cuenta, cantidad_retiro, descripcion2, fechita)
+    mi_cursor.execute(sql2, val2)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "Accion registrada exitosamente.")
 
 
 #cancelacion de prestamo
@@ -605,14 +620,26 @@ def tabladeamortizacion():
             print("{:^10d}{:^10.2f}{:^10.2f}{:^12.2f}{:^10.2f}{}" . format(mes,cuota,pagoInteres,Amortizacion,nuevosaldo,fechadepago))
 
 
+
+
+
+
+
+
+
+
+
+
+
 # DEPOSITO
 def Deposito():
   
     mi_cursor = mi_conexion.cursor()
-    cantidad_deposito= int(input("por favor digite el monto que desea depositar"))
-    cuenta=int(input("por favor dijite su id_cuenta"))
-    #ID
-    cliente=int(input("por favor dijite su id_cliente"))
+    fechita = input('Digite la fecha: ')
+    cliente=int(input("Digite ID de Cliente: "))
+    cuenta=int(input("Digite ID de Cuenta: "))
+    cantidad_deposito= int(input("Digite el monto que desea depositar: "))
+    
     mi_cursor.execute("SELECT balancedisponible_cuenta FROM Cuenta where id_cuenta= {} and id_cli= {} ".format(cuenta, cliente))
     lista_con_elementos = []
     for x in mi_cursor:
@@ -632,6 +659,17 @@ def Deposito():
 
     print(mi_cursor.rowcount, "record(s) affected")
 
+    descripcion= 'Deposito'
+
+    # Desde aqui code para que se anexen registros a la BD 
+    
+    sql2='INSERT INTO Movimientos (id_cli, id_cuenta, monto_movi, descrip_movi, fecha_movi) VALUES (%s,%s, %s,%s,%s)' 
+    val2=(cuenta, cuenta, cantidad_deposito, descripcion, fechita)
+    mi_cursor.execute(sql2, val2)
+
+    mi_conexion.commit()
+
+    print(mi_cursor.rowcount, "Accion registrada exitosamente.")
 
 
 def historial():

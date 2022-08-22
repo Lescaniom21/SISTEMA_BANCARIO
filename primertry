@@ -378,9 +378,9 @@ def estado():
 def pagoprestamo():
 
     cursor = mi_conexion.cursor()
-
-    id_cli=int(input("por favor dijite su ID de cliente: "))
-    numero_prestamo=int(input("por favor dijite su numero de prestamo"))
+    fechita= input('Digite la fecha: ')
+    id_cli=int(input("Digite su ID de cliente: "))
+    numero_prestamo=int(input("Digite su ID de prestamo"))
 
     #ID
     try:
@@ -449,6 +449,24 @@ def pagoprestamo():
     except Error as e:
         print('Ha ocurrido un error')
         print(e)
+
+
+
+    # Desde aqui el codigo para guardar el pago de prestamo en la tabla Pagos
+
+
+    
+    sql3='INSERT INTO Pagos (id_cli, id_pres, monto_pago, fecha_pago) VALUES (%s, %s, %s, %s)' 
+    
+    val3=(id_cli, numero_prestamo, cuotass, fechita)
+    
+    mycursor.execute(sql3, val3)
+
+    mi_conexion.commit()
+    
+    print(mycursor.rowcount, "Pago registrado exitosamente.")
+
+
 
 
 

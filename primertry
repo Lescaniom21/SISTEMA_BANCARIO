@@ -34,10 +34,10 @@ except Error as e:
    
 
 
-def desconectarbd(conexion):
+def desconectarbd(mi_conexion):
     try:
-        if conexion:
-            conexion.close()
+        if mi_conexion:
+            mi_conexion.close()
             print('La conexion ha finalizado')
 
 
@@ -309,11 +309,6 @@ def transferencias():
 
 
 
-
-
-#insertando y arreglando funciones de Charlot
-
-
 def estado():
     mycursor=mi_conexion.cursor()
     print("Consulta de clientes \n")
@@ -334,45 +329,89 @@ def estado():
         print(x)
 
 
-
-    mycursor.execute('SELECT monto_pres FROM Prestamos WHERE id_cli={}'.format(cliente)) 
-    #Falta agrgar monto pagado.
+    mycursor.execute('SELECT monto_pres, montopagado FROM Prestamos WHERE id_cli={}'.format(cliente)) 
     montoprestamo= mycursor.fetchall()
     for x in montoprestamo:
-        print("Monto Prestado")
+        print("Monto del Prestamo - Monto Pagado")
         print(x)
 
 
+#integrando code de Mendez
 
+#CHECK
 
 #obtener monto de prestamo
+
 def pagoprestamo():
 
-    mi_cursor = mi_conexion.cursor()
+    cursor = mi_conexion.cursor()
 
-    monto_pagar= int(input("por favor digite el monto que desea pagar: "))
     id_cli=int(input("por favor dijite su ID de cliente: "))
+    numero_prestamo=int(input("por favor dijite su numero de prestamo"))
+
     #ID
     try:
-        numero_prestamo=int(input("por favor dijite su ID de prestamo"))
-        mi_cursor.execute("SELECT monto_pres FROM Prestamos where id_cli= {} and id_pres= {} ".format(id_cli, numero_prestamo))
+        cursor.execute("SELECT monto_pres, tasainteres_pres, numcuotas_pres FROM Prestamos where id_cli= {} and id_pres= {} ".format(id_cli, numero_prestamo))
         lista_con_elementos = []
-        for x in mi_cursor:
+        for x in cursor:
             lista_con_elementos.append(x) 
+        print('El monto de prestamo es de ',lista_con_elementos[0][0])
 
-        print(lista_con_elementos[0][0])
+        interestasa= int(lista_con_elementos[0][1])/100
+        cuotas=int(lista_con_elementos[0][2])
+        cuotass=int(lista_con_elementos[0][0])/cuotas
+        intereses= int(lista_con_elementos[0][0])*interestasa
 
-        monto_total=int(lista_con_elementos[0][0]) - monto_pagar
-        print(monto_total)
-        resultado=str(monto_total)
+        print('El monto de prestamo que debe es de ', intereses)
+        print("La cuota que le corresponde pagar es de: ", cuotass) 
 
-        sql = "UPDATE Prestamos SET monto_pres = {} WHERE id_pres = {}".format(monto_total,numero_prestamo)
+        print('''
+        1. Desea pagar ahora. 
+        2. Cancelar pago.
+        ''')
+        pago=int(input("Seleccione: "))
 
-        mi_cursor.execute(sql)
+        if pago==1:
+            monto_pagado=int(lista_con_elementos[0][0]) - cuotass
+            montitoo=str(monto_pagado)
+            mycursor = mi_conexion.cursor()
 
-        mi_conexion.commit()
+            sql = "UPDATE Prestamos SET monto_pres = {} WHERE id_pres = {}".format(montitoo, numero_prestamo)
 
-        print(mi_cursor.rowcount, "record(s) affected")
+            mycursor.execute(sql)
+
+            mi_conexion.commit()
+
+            print(mycursor.rowcount, "record(s) affected")
+
+            try:
+                cursor.execute("SELECT montopagado FROM Prestamos where id_cli= {} and id_pres= {} ".format(id_cli, numero_prestamo))
+                ready = []
+                for x in cursor:
+                    ready.append(x)
+                pagado=(ready[0][0])
+                print(pagado)
+                montopagado= int(pagado) + cuotass
+                montito=str(montopagado)
+                monto = "UPDATE Prestamos SET  montopagado = {} WHERE id_pres = {}".format(montito, numero_prestamo)
+
+                mycursor.execute(monto)
+
+                mi_conexion.commit()
+
+            except Error as e:
+                print('Chequea el update a la tabla Lau')
+                print(e)
+
+
+        elif pago==0:
+            print("El pago ha sido cancelado")
+            mycursor.close()
+
+        else:
+            print("El dato suministrado es incorrecto")
+
+
             
     except Error as e:
         print('Ha ocurrido un error')
@@ -408,36 +447,30 @@ def retiroFT():
     print(mi_cursor.rowcount, "record(s) affected")
 
 
-def cancelacionpres():
-    #obtener monto de prestamo
-    monto_pagar= int(input("por favor digite el monto que desea pagar"))
-    cedula=int(input("por favor dijite su cedula"))
-    #ID
-    numero_prestamo=int(input("por favor dijite su numero de prestamo"))
-
-
 #cancelacion de prestamo
-'''
-def consulta_prestamo():
-    cursor= mi_conexion.cursor()
-    cursor.execute("SELECT monto_prestamo FROM prestamo where cedula= {} and id= {} ".format(cedula, numero_prestamo))
-    lista_con_elementos = []
-    for x in cursor:
-        lista_con_elementos.append(x) 
-    monto=int(lista_con_elementos[0][0])
-    print(monto)
 
-    if monto == 0:
-        print("usted ha calificado para cancelar su prestamo")
-    #elif monto_pagar > monto:
-        #print("Lo sentimos, usted esta pagando mas de lo que debe")
-    else:
-        print("Lo sentimos, usted no ha calificado para cancelar su prestamo")
-'''
+def cancelacion():
+    print("Cancelacion de prestamos")
+    mi_cursor = mi_conexion.cursor()
+    cliente=int(input("Digite su ID de cliente: "))
+    prestamo= int(input("Introduzca el numero del prestamo a cancelar: "))
+
+    mi_cursor.execute("SELECT monto_pres, tasainteres_pres FROM Prestamos where id_cli= {} and id_pres= {} ".format(cliente, prestamo))
+    lista_con_elementos = []
+    for x in mi_cursor:
+      lista_con_elementos.append(x) 
+    print(lista_con_elementos[0][0])
+
+    interestasa= int(lista_con_elementos[0][1])/100
+    intereses= int(lista_con_elementos[0][0])*interestasa
+    pagocancelprestamo= intereses + int(lista_con_elementos[0][0])
+    print("Debe de pagar este monto"+ str(pagocancelprestamo))
+    print("Su cancelación ha sido exitosa")
+
 
 def exit():
     print('Gracias por usar nuestros servicios.')
-
+    desconectarbd(mi_conexion)
 
 
 # INTEGRANDO DARWIN'S CODE
@@ -528,7 +561,7 @@ def Deposito():
 
 
 def historial():
-        #Calculando una tabla de amortización de un préstamo
+
     mycursor = mi_conexion.cursor()
 
 
@@ -577,13 +610,16 @@ print('''
 
 opcion = int(input('Por favor seleccione la opcion: \n'))
 
-if(opcion == 1):
+if(opcion==0):
+    exit()
+
+elif(opcion == 1):
     nuevacuenta()  
 
-if(opcion == 2):
+elif(opcion == 2):
     Deposito() 
 
-if(opcion == 3):  
+elif(opcion == 3):  
 
     print('''
         1- Solicitar Prestamo
@@ -599,41 +635,53 @@ if(opcion == 3):
     
     elige = int(input('Por favor seleccione la opcion: \n'))
 
-    if(elige == 1):
-        solicitar()  
-
-
-    if(elige==2):
-        tabladeamortizacion()
-
-
-    if(elige == 3):
-        pagoprestamo()  
-    
-    if(elige==5):
-        estado()
-
     if (elige==0):
         exit()
 
+    elif(elige == 1):
+        solicitar()  
+
+
+    elif(elige==2):
+        tabladeamortizacion()
+
+
+    elif(elige == 3):
+        pagoprestamo()
+
+    elif(elige== 4):
+        print('Estamos trabajando en esta funcion')  
+    
+    elif(elige==5):
+        estado()
+
+    elif(elige == 6):
+        print('Not ready')
+
+    elif (elige==0):
+        exit()
+
     else:
-        print('El numero establecido es incorrecto. ')
+        print('El valor establecido es incorrecto. ')
 
 
-if (opcion==5):
+elif (opcion==4):
+    print('Estamos trabajando en esta funcion')
+
+elif (opcion==5):
     consultacliente()
 
-if (opcion==6):
+elif (opcion==6):
     transferencias()
 
-if(opcion == 7):
+elif(opcion == 7):
     retiroFT() 
 
-if(opcion == 8):
+elif(opcion == 8):
     balance() 
 
-if(opcion==9):
+elif(opcion==9):
     historial()
 
 else:
-        print('El numero establecido es incorrecto. ')
+    print('El numero establecido es incorrecto. ')

@@ -252,23 +252,6 @@ def movimientos():
         print(x)
 
 
-# Funcion Clientes Activos
-'''
-def clientesactive():
-    cursor=mi_conexion.cursor()
-
-    sql = "SELECT * FROM Cliente\
-    INNER JOIN Cuenta ON id_cli=id_cuenta\
-        WHERE estado_cuenta='Activa'"
-    
-
-    cursor.execute(sql)
-
-    myresult = cursor.fetchall()
-
-    for x in myresult:
-        print(x)
-'''
 
 # Cliente Consulta
 def consultacliente():
@@ -281,6 +264,7 @@ def consultacliente():
     for x in result:
         
         print(x)
+
 
 # Recuerda anexar los cambios en TABLA MOVIMIENTO funcion RETIRO y DEPOSITO
 #Transferencias Bancarias
@@ -678,7 +662,7 @@ def historial():
 
 
     #ID
-    cliente=int(input("por favor dijite su id_cliente"))
+    cliente=int(input("Digite su ID Cliente: "))
     mycursor.execute("SELECT nom_cli,cedula_cli FROM Cliente where id_cli= {} ".format(cliente))
     lista_con_elementos = []
     for x in mycursor:
@@ -688,21 +672,17 @@ def historial():
     cedula=lista_con_elementos[0][1]
 
 
-    mycursor.execute("SELECT * FROM Movimientos where id_cli= {} ".format(cliente))
+    mycursor.execute("SELECT id_movi, monto_movi, descrip_movi, fecha_movi FROM Movimientos where id_cli= {} ".format(cliente))
     lista=[]
     for x in mycursor:
         lista.append (x)
-    print('el cliente es', codcliente,cedula)
+    print('\n','HISTORIAL')
+    print('Cliente: ', codcliente,' - Cedula: ',cedula)
+    
+    print('\n','ID - Monto - Descripcion - Fecha')
     print(lista)
 
 
-#a=input('Diga name')
-#b=input('Diga pass')
-
-#conexion= conectarbd(a,b)
-#if conexion:
- #   mostrarbd(conexion)
-  #  desconectarbd(conexion)
 
 
 #desde aqui el menu de opciones

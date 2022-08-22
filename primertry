@@ -605,16 +605,6 @@ def tabladeamortizacion():
 
 
 
-
-
-
-
-
-
-
-
-
-
 # DEPOSITO
 def Deposito():
   

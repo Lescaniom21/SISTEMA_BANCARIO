@@ -120,6 +120,33 @@ print(mycursor.rowcount, "was inserted.")
 #mycursor.execute('TRUNCATE Cliente')
 
 #seleccionando tablas
+
+'''
+mycursor.execute("CREATE TABLE Pagos (id_pago INT AUTO_INCREMENT PRIMARY KEY, id_cli INT not null, id_pres INT not null, monto_pago VARCHAR (20), fecha_pago VARCHAR (20))")
+
+'''
+s = "INSERT INTO Pagos (id_cli, id_pres, monto_pago, fecha_pago) VALUES (%s, %s, %s, %s)"
+va = [
+  ('3', '3', '15000', '1982-3-8'),
+  ('4', '4', '250', '2005-8-8'),
+  ('5','5','11050','2002-5-8')
+]
+
+mycursor.executemany(s, va)
+
+mybd.commit()
+print(mycursor.rowcount, "was inserted.")
+
+
+mycursor.execute('SELECT * FROM Cliente')
+myresult = mycursor.fetchall()
+
+for x in myresult:
+ print(x)
+
+print('\n')
+
+
 mycursor.execute('SELECT * FROM Cliente')
 myresult = mycursor.fetchall()
 

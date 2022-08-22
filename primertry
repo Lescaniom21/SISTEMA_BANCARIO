@@ -99,7 +99,7 @@ def nuevacuenta():
     mycursor.execute(sql, val)
 
     mi_conexion.commit()
-    print(mycursor.rowcount, "was inserted.")
+    print(mycursor.rowcount, "nuevo usuario cliente fue creado exitosamente.")
  
 
 #inicia la funcion de solicitar prestamos
@@ -338,7 +338,6 @@ def estado():
 
 #integrando code de Mendez
 
-#CHECK
 
 #obtener monto de prestamo
 
@@ -464,8 +463,31 @@ def cancelacion():
     interestasa= int(lista_con_elementos[0][1])/100
     intereses= int(lista_con_elementos[0][0])*interestasa
     pagocancelprestamo= intereses + int(lista_con_elementos[0][0])
-    print("Debe de pagar este monto"+ str(pagocancelprestamo))
-    print("Su cancelación ha sido exitosa")
+    print('\n',"Para cancelar su prestamo debe pagar:  ", str(pagocancelprestamo))
+
+    print('''Esta seguro de que quiere cancelar su prestamo? 
+    1. Si.
+    2. No.
+    ''')
+    seleccion=int(input('1 o 2: '))
+
+    if seleccion == 1:
+        resultado= int(lista_con_elementos[0][0]) - int(lista_con_elementos[0][0])
+        print('El monto del prestamo esta en ', resultado)
+        monto = "UPDATE Prestamos SET  montopagado = {} WHERE id_pres = {}".format(pagocancelprestamo, prestamo)
+        
+        mi_cursor.execute(monto)
+
+        mi_conexion.commit()
+
+        hey= "UPDATE Prestamos SET  monto_pres = {} WHERE id_pres = {}".format(resultado, prestamo)
+
+        print(mi_cursor.rowcount, "record(s) affected")
+
+        print("Su cancelación ha sido exitosa")
+    
+    else:
+        exit()
 
 
 def exit():
@@ -650,7 +672,7 @@ elif(opcion == 3):
         pagoprestamo()
 
     elif(elige== 4):
-        print('Estamos trabajando en esta funcion')  
+        cancelacion()  
     
     elif(elige==5):
         estado()
